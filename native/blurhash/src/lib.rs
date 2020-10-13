@@ -57,15 +57,29 @@ pub unsafe extern "C" fn blurhash_string_free(ptr: *const c_char) {
 pub unsafe extern "C" fn blurhash_link_me_please() {}
 
 fn encode_image(path: PathBuf) -> Result<String, &'static str> {
-    let img = image::open(path).map_err(|_| "failed to open the image")?;
-    let (width, height) = img.dimensions();
-    let rgb = img.to_rgba().into_raw();
-    let blurhash = blurhash::encode(4, 3, width, height, &rgb);
-    Ok(blurhash)
+    let t = std::thread::Builder::new().name(String::from("blurhash"));
+    let t = t
+        .spawn(|| {
+            let img = image::open(path).map_err(|_| "failed to open the image")?;
+            let (width, height) = img.dimensions();
+            let rgb = img.to_rgba().into_raw();
+            let blurhash = blurhash::encode(4, 3, width, height, &rgb);
+            Ok(blurhash)
+        })
+        .map_err(|_| "spwan error")?;
+    let result = t.join().map_err(|_| "join error")??;
+    Ok(result)
 }
 
 fn image_size(path: PathBuf) -> Result<String, &'static str> {
-    let img = image::open(path).map_err(|_| "failed to open the image")?;
-    let (width, height) = img.dimensions();
+    let t = std::thread::Builder::new().name(String::from("blurhash"));
+    let t = t
+        .spawn(|| {
+            let img = image::open(path).map_err(|_| "failed to open the image")?;
+            let (width, height) = img.dimensions();
+            Ok((width, height))
+        })
+        .map_err(|_| "spwan error")?;
+    let (width, height) = t.join().map_err(|_| "join error")??;
     Ok(format!("{}*{}", width, height))
 }

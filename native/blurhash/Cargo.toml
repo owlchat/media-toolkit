@@ -13,7 +13,7 @@ crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
 blurhash = "0.1"
-image = { version = "0.23", default-features = false, features = ["jpeg"] }
+image = { version = "0.23", default-features = false, features = ["jpeg", "png", "webp"] }
 
 [build-dependencies]
 cbindgen = "0.15"
