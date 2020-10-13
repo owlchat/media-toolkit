@@ -1,5 +1,5 @@
 [package]
-name = "blurhash"
+name = "blurhash-ffi"
 version = "0.1.0"
 authors = ["Shady Khalifa <shekohex@gmail.com>"]
 edition = "2018"
