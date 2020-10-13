@@ -18,7 +18,7 @@ class Blurhash {
         _dl.lookupFunction<_c_blurhash_string_free, _dart_blurhash_string_free>(
             'blurhash_string_free');
     final hashPtr = _blurhashEncode(uri.path.toUtf8Pointer());
-    if (hashPtr != null) {
+    if (hashPtr != nullptr) {
       final hash = ffi.Utf8.fromUtf8(hashPtr);
       _blurhashStringFree(hashPtr);
       return hash;
@@ -34,7 +34,7 @@ class Blurhash {
         _dl.lookupFunction<_c_blurhash_string_free, _dart_blurhash_string_free>(
             'blurhash_string_free');
     final sizePtr = _blurhashSize(uri.path.toUtf8Pointer());
-    if (sizePtr != null) {
+    if (sizePtr != nullptr) {
       final sizeStr = ffi.Utf8.fromUtf8(sizePtr);
       final parts = sizeStr.split('*');
       _blurhashStringFree(sizePtr);
