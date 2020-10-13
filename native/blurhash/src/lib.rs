@@ -1,8 +1,8 @@
-use std::path::PathBuf;
 use image::GenericImageView;
-use std::os::raw::c_char;
 use std::ffi::CString;
 use std::mem::ManuallyDrop;
+use std::os::raw::c_char;
+use std::path::PathBuf;
 
 mod macros;
 
@@ -13,7 +13,7 @@ mod macros;
 /// the caller should call [`blurhash_string_free`] after getting the result
 /// to free any allocated resources
 #[no_mangle]
-pub unsafe extern fn blurhash_encode(path: *const c_char) -> *const c_char {
+pub unsafe extern "C" fn blurhash_encode(path: *const c_char) -> *const c_char {
     let path = cstr!(path);
     let path = PathBuf::from(path);
     let hash = unwrap_or_null!(encode_image(path));
@@ -29,7 +29,7 @@ pub unsafe extern fn blurhash_encode(path: *const c_char) -> *const c_char {
 /// the caller should call [`blurhash_string_free`] after getting the result
 /// to free any allocated resources
 #[no_mangle]
-pub unsafe extern fn blurhash_size(path: *const c_char) -> *const c_char {
+pub unsafe extern "C" fn blurhash_size(path: *const c_char) -> *const c_char {
     let path = cstr!(path);
     let path = PathBuf::from(path);
     let size = unwrap_or_null!(image_size(path));
@@ -50,9 +50,11 @@ pub unsafe extern "C" fn blurhash_string_free(ptr: *const c_char) {
 }
 
 /// A Hack to force iOS To link to this lib
+/// ### Safety
+/// Don't call this nop function
 #[no_mangle]
 #[inline(never)]
-pub unsafe extern fn blurhash_link_me_please() {}
+pub unsafe extern "C" fn blurhash_link_me_please() {}
 
 fn encode_image(path: PathBuf) -> Result<String, &'static str> {
     let img = image::open(path).map_err(|_| "failed to open the image")?;
