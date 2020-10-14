@@ -23,7 +23,7 @@ macro_rules! cstr {
         if $ptr.is_null() {
             return $error;
         }
-        $crate::unwrap_or_null!(::std::ffi::CStr::from_ptr($ptr).to_str(), $error)
+        $crate::unwrap_or!(::std::ffi::CStr::from_ptr($ptr).to_str(), $error)
     }};
 }
 
@@ -31,9 +31,13 @@ macro_rules! cstr {
 #[macro_export]
 macro_rules! unwrap_or_null {
     ($result:expr) => {
-        $crate::unwrap_or_null!($result, std::ptr::null());
+        $crate::unwrap_or!($result, std::ptr::null());
     };
+}
 
+#[doc(hidden)]
+#[macro_export]
+macro_rules! unwrap_or {
     ($result:expr, $err:expr) => {
         match $result {
             Ok(value) => value,

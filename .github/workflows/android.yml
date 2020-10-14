@@ -91,8 +91,8 @@ jobs:
 
       - name: Prepare Release
         run: |
-          mv target/aarch64-linux-android/release/libblurhash.so target/release/libblurhash-aarch64-linux-android.so
-          mv target/x86_64-linux-android/release/libblurhash.so target/release/libblurhash-x86_64-linux-android.so
+          mv target/aarch64-linux-android/release/libmedia_toolkit.so target/release/libmedia_toolkit-aarch64-linux-android.so
+          mv target/x86_64-linux-android/release/libmedia_toolkit.so target/release/libmedia_toolkit-x86_64-linux-android.so
 
       - name: Create release
         uses: softprops/action-gh-release@v1
@@ -100,7 +100,7 @@ jobs:
           prerelease: true
           tag_name: latest
           files: |
-            target/release/libblurhash-aarch64-linux-android.so
-            target/release/libblurhash-x86_64-linux-android.so
+            target/release/libmedia_toolkit-aarch64-linux-android.so
+            target/release/libmedia_toolkit-x86_64-linux-android.so
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

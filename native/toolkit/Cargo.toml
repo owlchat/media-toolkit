@@ -1,11 +1,11 @@
 [package]
-name = "blurhash-ffi"
+name = "media-toolkit"
 version = "0.1.0"
 authors = ["Shady Khalifa <shekohex@gmail.com>"]
 edition = "2018"
 
 [lib]
-name = "blurhash"
+name = "media_toolkit"
 # this value will change depending on the target os
 # for iOS it would be `staticlib`
 # for android it would be `c-dylib`

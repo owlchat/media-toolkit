@@ -62,8 +62,8 @@ jobs:
 
       - name: Prepare Release
         run: |
-          mv target/universal/release/libblurhash.a target/release/libblurhash-universal-apple-ios.a
-          mv native/blurhash/binding.h target/release/blurhash.h
+          mv target/universal/release/libmedia_toolkit.a target/release/libmedia_toolkit-universal-apple-ios.a
+          mv native/toolkit/binding.h target/release/media_toolkit.h
 
       - name: Create release
         uses: softprops/action-gh-release@v1
@@ -71,7 +71,7 @@ jobs:
           prerelease: true
           tag_name: latest
           files: |
-            target/release/libblurhash-universal-apple-ios.a
-            target/release/blurhash.h
+            target/release/libmedia_toolkit-universal-apple-ios.a
+            target/release/media_toolkit.h
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
