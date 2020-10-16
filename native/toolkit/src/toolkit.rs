@@ -1,12 +1,11 @@
 use image::jpeg::JpegEncoder;
-use image::GenericImageView;
 use std::path::PathBuf;
 
 pub(crate) fn blurhash_encode(path: PathBuf) -> Result<String, &'static str> {
     let img = image::open(path).map_err(|_| "failed to open the image")?;
-    let (width, height) = img.dimensions();
-    let rgb = img.to_rgba().into_raw();
-    let blurhash = blurhash::encode(4, 3, width, height, &rgb);
+    let thumbnail = img.thumbnail(64, 64);
+    let rgb = thumbnail.to_rgba().into_raw();
+    let blurhash = blurhash::encode(4, 3, 64, 64, &rgb);
     Ok(blurhash)
 }
 
