@@ -4,13 +4,12 @@ import 'dart:io';
 import 'package:ffi/ffi.dart' as ffi;
 import 'ffi.dart' as ffi;
 
-
 class MediaToolkit {
   static ffi.RawMediaToolkit _raw = _load();
 
-  String encodeBlurhash(Uri uri) {
+  String encodeBlurhash(String uri) {
     final result = _raw.toolkit_blurhash_encode(
-      uri.path.toUtf8Pointer().cast(),
+      uri.toUtf8Pointer().cast(),
     );
     if (result != nullptr) {
       final hash = ffi.Utf8.fromUtf8(result.cast());
@@ -20,9 +19,9 @@ class MediaToolkit {
     }
   }
 
-  Size calculateImageDimensions(Uri uri) {
+  Size calculateImageDimensions(String uri) {
     final result = _raw.toolkit_image_dimensions(
-      uri.path.toUtf8Pointer().cast(),
+      uri.toUtf8Pointer().cast(),
     );
     if (result != nullptr) {
       final sizeStr = ffi.Utf8.fromUtf8(result.cast());
@@ -33,10 +32,10 @@ class MediaToolkit {
     }
   }
 
-  void encodeJpeg(Uri original, Uri out, int quality) {
+  void encodeJpeg(String original, String out, int quality) {
     final result = _raw.toolkit_encode_jpeg(
-      original.path.toUtf8Pointer().cast(),
-      out.path.toUtf8Pointer().cast(),
+      original.toUtf8Pointer().cast(),
+      out.toUtf8Pointer().cast(),
       quality,
     );
     if (result != 1) {
