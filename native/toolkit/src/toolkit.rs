@@ -24,9 +24,9 @@ pub(crate) fn encode_jpeg(
     quality: u8,
 ) -> Result<(), OpStatusCode> {
     let buf = std::fs::read(path).map_err(|_| OpStatusCode::BadPath)?;
-    let img = match bake_orientation(&buf)? {
-        Some(img) => img,
-        None => image::load_from_memory(&buf).map_err(|_| OpStatusCode::LoadImageFailed)?,
+    let img = match bake_orientation(&buf) {
+        Ok(Some(img)) => img,
+        _ => image::load_from_memory(&buf).map_err(|_| OpStatusCode::LoadImageFailed)?,
     };
     let mut out = Vec::new();
     let mut encoder = JpegEncoder::new_with_quality(&mut out, quality);
