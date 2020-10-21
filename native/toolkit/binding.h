@@ -3,6 +3,17 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+typedef enum OpStatusCode {
+  Ok = 1,
+  BadPath = 2,
+  OpenImageFailed = 3,
+  LoadImageFailed = 4,
+  JpegEncodeFailed = 5,
+  ExifReadFailed = 6,
+  JpegSaveFailed = 7,
+  Unknown = 255,
+} OpStatusCode;
+
 // Create A Blurhash from the given image at `path`
 // ### Safety
 // this assumes that the given path is not null and the path exists and points to an image
@@ -23,7 +34,7 @@ const char *toolkit_image_dimensions(const char *path);
 // ### Safety
 // this assumes that the given path is not null and the path exists and points to an image
 // otherwise this function will return zero
-int32_t toolkit_encode_jpeg(const char *in_path, const char *out_path, uint8_t quality);
+OpStatusCode toolkit_encode_jpeg(const char *in_path, const char *out_path, uint8_t quality);
 
 // Free (Drop) a string value allocated by Rust.
 // ### Safety

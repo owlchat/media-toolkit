@@ -6,7 +6,7 @@ fn main() {
         language: cbindgen::Language::C,
         documentation_style: cbindgen::DocumentationStyle::C99,
         line_length: 100,
-        style: cbindgen::Style::Type,
+        style: cbindgen::Style::Both,
         ..Default::default()
     };
     cbindgen::Builder::new()

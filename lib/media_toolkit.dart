@@ -38,9 +38,7 @@ class MediaToolkit {
       out.toUtf8Pointer().cast(),
       quality,
     );
-    if (result != 1) {
-      throw StateError('Failed to encode the image as jpeg!');
-    }
+    _assertOk(result);
   }
 }
 
@@ -65,5 +63,31 @@ ffi.RawMediaToolkit _load() {
 extension StringUtf8Pointer on String {
   Pointer<ffi.Utf8> toUtf8Pointer() {
     return ffi.Utf8.toUtf8(this);
+  }
+}
+
+void _assertOk(int status) {
+  if (status != ffi.OpStatusCode.Ok) {
+    throw StateError(_operationStatusCodeToErrorMessage(status));
+  }
+}
+
+String _operationStatusCodeToErrorMessage(int status) {
+  switch (status) {
+    case ffi.OpStatusCode.BadPath:
+      return 'Bad Path Provided (status: $status).';
+    case ffi.OpStatusCode.JpegEncodeFailed:
+      return 'Failed to encode Jpeg (status: $status)';
+    case ffi.OpStatusCode.ExifReadFailed:
+      return 'Failed to Read/Parse EXIF from the Image (status: $status)';
+    case ffi.OpStatusCode.JpegSaveFailed:
+      return 'Failed to save Jpeg to the file (status: $status)';
+    case ffi.OpStatusCode.LoadImageFailed:
+      return 'Failed to load the image into memory (status: $status)';
+    case ffi.OpStatusCode.OpenImageFailed:
+      return 'Failed to open the image (status: $status)';
+    case ffi.OpStatusCode.Unknown:
+    default:
+      return 'Unknonw Status Code: $status';
   }
 }

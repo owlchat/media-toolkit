@@ -87,14 +87,24 @@ class RawMediaToolkit {
   /// // A Hack to force iOS To link to this lib
   /// // ### Safety
   /// // Don't call this nop function
-  void blurhash_link_me_please() {
-    _blurhash_link_me_please ??= _dylib.lookupFunction<
-        _c_blurhash_link_me_please,
-        _dart_blurhash_link_me_please>('blurhash_link_me_please');
-    return _blurhash_link_me_please();
+  void toolkit_link_me_please() {
+    _toolkit_link_me_please ??= _dylib.lookupFunction<_c_toolkit_link_me_please,
+        _dart_toolkit_link_me_please>('toolkit_link_me_please');
+    return _toolkit_link_me_please();
   }
 
-  _dart_blurhash_link_me_please _blurhash_link_me_please;
+  _dart_toolkit_link_me_please _toolkit_link_me_please;
+}
+
+abstract class OpStatusCode {
+  static const int Ok = 1;
+  static const int BadPath = 2;
+  static const int OpenImageFailed = 3;
+  static const int LoadImageFailed = 4;
+  static const int JpegEncodeFailed = 5;
+  static const int ExifReadFailed = 6;
+  static const int JpegSaveFailed = 7;
+  static const int Unknown = 255;
 }
 
 typedef _c_toolkit_blurhash_encode = ffi.Pointer<ffi.Int8> Function(
@@ -133,6 +143,6 @@ typedef _dart_toolkit_string_free = void Function(
   ffi.Pointer<ffi.Int8> ptr,
 );
 
-typedef _c_blurhash_link_me_please = ffi.Void Function();
+typedef _c_toolkit_link_me_please = ffi.Void Function();
 
-typedef _dart_blurhash_link_me_please = void Function();
+typedef _dart_toolkit_link_me_please = void Function();

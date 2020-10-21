@@ -47,13 +47,15 @@ pub unsafe extern "C" fn toolkit_encode_jpeg(
     in_path: *const c_char,
     out_path: *const c_char,
     quality: u8,
-) -> i32 {
-    let in_path = cstr!(in_path, 0);
-    let out_path = cstr!(out_path, 0);
+) -> OpStatusCode {
+    let in_path = cstr!(in_path, OpStatusCode::BadPath);
+    let out_path = cstr!(out_path, OpStatusCode::BadPath);
     let in_path = PathBuf::from(in_path);
     let out_path = PathBuf::from(out_path);
-    unwrap_or!(toolkit::encode_jpeg(in_path, out_path, quality), 0);
-    1
+    match toolkit::encode_jpeg(in_path, out_path, quality) {
+        Ok(_) => OpStatusCode::Ok,
+        Err(e) => e,
+    }
 }
 
 /// Free (Drop) a string value allocated by Rust.
@@ -73,3 +75,16 @@ pub unsafe extern "C" fn toolkit_string_free(ptr: *const c_char) {
 #[no_mangle]
 #[inline(never)]
 pub unsafe extern "C" fn toolkit_link_me_please() {}
+
+#[repr(C)]
+#[derive(Eq, PartialEq)]
+pub enum OpStatusCode {
+    Ok = 1,
+    BadPath = 2,
+    OpenImageFailed = 3,
+    LoadImageFailed = 4,
+    JpegEncodeFailed = 5,
+    ExifReadFailed = 6,
+    JpegSaveFailed = 7,
+    Unknown = 255,
+}
