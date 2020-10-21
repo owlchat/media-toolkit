@@ -1,5 +1,5 @@
 use exif::{In, Tag};
-use image::{jpeg::JpegEncoder, DynamicImage, GenericImageView, ImageFormat};
+use image::{jpeg::JpegEncoder, DynamicImage, GenericImageView};
 use std::path::PathBuf;
 
 use crate::OpStatusCode;
@@ -23,19 +23,17 @@ pub(crate) fn encode_jpeg(
     out_path: PathBuf,
     quality: u8,
 ) -> Result<(), OpStatusCode> {
-    let img = image::open(&path).map_err(|_| OpStatusCode::OpenImageFailed)?;
+    let buf = std::fs::read(path).map_err(|_| OpStatusCode::BadPath)?;
+    let img = match bake_orientation(&buf)? {
+        Some(img) => img,
+        None => image::load_from_memory(&buf).map_err(|_| OpStatusCode::LoadImageFailed)?,
+    };
     let mut out = Vec::new();
     let mut encoder = JpegEncoder::new_with_quality(&mut out, quality);
     encoder
         .encode_image(&img)
         .map_err(|_| OpStatusCode::JpegEncodeFailed)?;
-    let img = bake_orientation(&mut out)?;
-    if let Some(img) = img {
-        let buf = img.to_bytes();
-        std::fs::write(out_path, buf).map_err(|_| OpStatusCode::JpegSaveFailed)?;
-    } else {
-        std::fs::write(out_path, out).map_err(|_| OpStatusCode::JpegSaveFailed)?;
-    }
+    std::fs::write(out_path, out).map_err(|_| OpStatusCode::JpegSaveFailed)?;
     Ok(())
 }
 
@@ -76,7 +74,7 @@ impl From<u8> for Orientation {
     }
 }
 
-pub(crate) fn bake_orientation(buf: &mut [u8]) -> Result<Option<DynamicImage>, OpStatusCode> {
+pub(crate) fn bake_orientation(buf: &[u8]) -> Result<Option<DynamicImage>, OpStatusCode> {
     let mut io = std::io::Cursor::new(buf);
     let exifreader = exif::Reader::new();
     let exif = exifreader
@@ -93,7 +91,7 @@ pub(crate) fn bake_orientation(buf: &mut [u8]) -> Result<Option<DynamicImage>, O
     }
     io.set_position(0);
     // Trying to fix orientation
-    let img = image::load(io, ImageFormat::Jpeg).map_err(|_| OpStatusCode::LoadImageFailed)?;
+    let img = image::load_from_memory(buf).map_err(|_| OpStatusCode::LoadImageFailed)?;
     let img = match orientation {
         Orientation::Up => return Ok(None),
         Orientation::UpMirrored => img.fliph(),
