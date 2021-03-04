@@ -1,18 +1,16 @@
 import 'dart:ffi';
 import 'dart:io';
 
-import 'package:ffi/ffi.dart' as ffi;
+import 'package:ffi/ffi.dart';
 import 'ffi.dart' as ffi;
 
 class MediaToolkit {
   static ffi.RawMediaToolkit _raw = _load();
 
   String encodeBlurhash(String uri) {
-    final result = _raw.toolkit_blurhash_encode(
-      uri.toUtf8Pointer().cast(),
-    );
+    final result = _raw.toolkit_blurhash_encode(uri.toNativeUtf8().cast());
     if (result != nullptr) {
-      final hash = ffi.Utf8.fromUtf8(result.cast());
+      final hash = result.cast<Utf8>().toDartString();
       return hash;
     } else {
       throw StateError('Failed to generate blurhash');
@@ -21,10 +19,10 @@ class MediaToolkit {
 
   Size calculateImageDimensions(String uri) {
     final result = _raw.toolkit_image_dimensions(
-      uri.toUtf8Pointer().cast(),
+      uri.toNativeUtf8().cast(),
     );
     if (result != nullptr) {
-      final sizeStr = ffi.Utf8.fromUtf8(result.cast());
+      final sizeStr = result.cast<Utf8>().toDartString();
       final parts = sizeStr.split('*');
       return Size(double.parse(parts[0]), double.parse(parts[1]));
     } else {
@@ -34,8 +32,8 @@ class MediaToolkit {
 
   void encodeJpeg(String original, String out, int quality) {
     final result = _raw.toolkit_encode_jpeg(
-      original.toUtf8Pointer().cast(),
-      out.toUtf8Pointer().cast(),
+      original.toNativeUtf8().cast(),
+      out.toNativeUtf8().cast(),
       quality,
     );
     _assertOk(result);
@@ -57,12 +55,6 @@ ffi.RawMediaToolkit _load() {
     return ffi.RawMediaToolkit(DynamicLibrary.executable());
   } else {
     throw UnsupportedError('The Current Platform is not supported.');
-  }
-}
-
-extension StringUtf8Pointer on String {
-  Pointer<ffi.Utf8> toUtf8Pointer() {
-    return ffi.Utf8.toUtf8(this);
   }
 }
 

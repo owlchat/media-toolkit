@@ -20,15 +20,14 @@ class RawMediaToolkit {
   ffi.Pointer<ffi.Int8> toolkit_blurhash_encode(
     ffi.Pointer<ffi.Int8> path,
   ) {
-    _toolkit_blurhash_encode ??= _dylib.lookupFunction<
+    return (_toolkit_blurhash_encode ??= _dylib.lookupFunction<
         _c_toolkit_blurhash_encode,
-        _dart_toolkit_blurhash_encode>('toolkit_blurhash_encode');
-    return _toolkit_blurhash_encode(
+        _dart_toolkit_blurhash_encode>('toolkit_blurhash_encode'))(
       path,
     );
   }
 
-  _dart_toolkit_blurhash_encode _toolkit_blurhash_encode;
+  _dart_toolkit_blurhash_encode? _toolkit_blurhash_encode;
 
   /// // Calculates the image dimensions and returns "width*height" string
   /// // ### Safety
@@ -39,15 +38,14 @@ class RawMediaToolkit {
   ffi.Pointer<ffi.Int8> toolkit_image_dimensions(
     ffi.Pointer<ffi.Int8> path,
   ) {
-    _toolkit_image_dimensions ??= _dylib.lookupFunction<
+    return (_toolkit_image_dimensions ??= _dylib.lookupFunction<
         _c_toolkit_image_dimensions,
-        _dart_toolkit_image_dimensions>('toolkit_image_dimensions');
-    return _toolkit_image_dimensions(
+        _dart_toolkit_image_dimensions>('toolkit_image_dimensions'))(
       path,
     );
   }
 
-  _dart_toolkit_image_dimensions _toolkit_image_dimensions;
+  _dart_toolkit_image_dimensions? _toolkit_image_dimensions;
 
   /// // Encode the image into jpeg and saves it to another place
   /// // ### Safety
@@ -58,16 +56,16 @@ class RawMediaToolkit {
     ffi.Pointer<ffi.Int8> out_path,
     int quality,
   ) {
-    _toolkit_encode_jpeg ??= _dylib.lookupFunction<_c_toolkit_encode_jpeg,
-        _dart_toolkit_encode_jpeg>('toolkit_encode_jpeg');
-    return _toolkit_encode_jpeg(
+    return (_toolkit_encode_jpeg ??= _dylib.lookupFunction<
+        _c_toolkit_encode_jpeg,
+        _dart_toolkit_encode_jpeg>('toolkit_encode_jpeg'))(
       in_path,
       out_path,
       quality,
     );
   }
 
-  _dart_toolkit_encode_jpeg _toolkit_encode_jpeg;
+  _dart_toolkit_encode_jpeg? _toolkit_encode_jpeg;
 
   /// // Free (Drop) a string value allocated by Rust.
   /// // ### Safety
@@ -75,25 +73,25 @@ class RawMediaToolkit {
   void toolkit_string_free(
     ffi.Pointer<ffi.Int8> ptr,
   ) {
-    _toolkit_string_free ??= _dylib.lookupFunction<_c_toolkit_string_free,
-        _dart_toolkit_string_free>('toolkit_string_free');
-    return _toolkit_string_free(
+    return (_toolkit_string_free ??= _dylib.lookupFunction<
+        _c_toolkit_string_free,
+        _dart_toolkit_string_free>('toolkit_string_free'))(
       ptr,
     );
   }
 
-  _dart_toolkit_string_free _toolkit_string_free;
+  _dart_toolkit_string_free? _toolkit_string_free;
 
   /// // A Hack to force iOS To link to this lib
   /// // ### Safety
   /// // Don't call this nop function
   void toolkit_link_me_please() {
-    _toolkit_link_me_please ??= _dylib.lookupFunction<_c_toolkit_link_me_please,
-        _dart_toolkit_link_me_please>('toolkit_link_me_please');
-    return _toolkit_link_me_please();
+    return (_toolkit_link_me_please ??= _dylib.lookupFunction<
+        _c_toolkit_link_me_please,
+        _dart_toolkit_link_me_please>('toolkit_link_me_please'))();
   }
 
-  _dart_toolkit_link_me_please _toolkit_link_me_please;
+  _dart_toolkit_link_me_please? _toolkit_link_me_please;
 }
 
 abstract class OpStatusCode {
