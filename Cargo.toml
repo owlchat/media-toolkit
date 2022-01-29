@@ -1,9 +1,0 @@
-[workspace]
-members = [
-  "native/*",
-]
-
-[profile.release]
-lto = true
-panic = 'unwind'
-codegen-units = 1
