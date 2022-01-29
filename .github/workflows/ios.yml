@@ -66,6 +66,7 @@ jobs:
           args: -p development native
 
       - name: Run Native Tests (in Flutter)
+        if: false # skip these tests, since we don't have any, for now.
         run: flutter test
 
       - name: Install iOS Targets
