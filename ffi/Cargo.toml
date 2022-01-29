@@ -1,0 +1,25 @@
+[package]
+name = "media-toolkit-ffi"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "owlchat_media_toolkit"
+# this value will change depending on the target os
+# for iOS it would be `staticlib`
+# for android it would be `c-dylib`
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+toolkit = { path = "../toolkit", package = "media-toolkit" }
+allo-isolate = { version = "0.1.12", optional = true }
+prost = "0.9.0"
+prost-types = "0.9.0"
+
+[build-dependencies]
+cbindgen = "0.20"
+prost-build = "0.9.0"
+
+[features]
+default = ["dart-ffi"]
+dart-ffi = ["allo-isolate"]

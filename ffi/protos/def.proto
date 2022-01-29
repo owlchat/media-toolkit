@@ -1,0 +1,57 @@
+syntax = "proto3";
+package owlchat;
+option cc_enable_arenas = false;
+
+message CalculateBlurhash {
+  string image_path = 1;
+}
+
+message GetImageDimensions {
+  string image_path = 1;
+}
+
+message EncodeImageAsJpeg {
+  string image_path = 1;
+  uint32 quality = 2;
+}
+
+message Request {
+  oneof body {
+    CalculateBlurhash blurhash_encode = 1;
+    GetImageDimensions image_dimensions = 2;
+    EncodeImageAsJpeg image_encode = 3;
+  }
+}
+
+message Blurhash {
+  string value = 1;
+}
+
+message ImageDimensions {
+  uint32 width = 1;
+  uint32 height = 2;
+}
+
+message JpegImage {
+  bytes value = 1;
+}
+
+message Response {
+  message Error {
+    enum Kind {
+      UNKNOWN = 0;
+      MISSING_REQUEST_BODY = 1;
+      INVALID_FILE_PATH = 2;
+      FAILED_TO_LOAD_IMAGE = 3;
+      JPEG_ENCODING_FAILED = 4;
+    }
+    string message = 1;
+    Kind kind = 2;
+  }
+  oneof body {
+    Error error = 1;
+    Blurhash blurhash = 2;
+    ImageDimensions image_dimensions = 3;
+    JpegImage jpeg_image = 4;
+  }
+}

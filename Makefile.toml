@@ -1,0 +1,218 @@
+[config]
+additional_profiles = ["development", "production"]
+
+[env]
+CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = true
+CARGO_MAKE_WORKSPACE_INCLUDE_MEMBERS = ["ffi"]
+ANDROID_PLATFORM_VERSION = "28"
+LIB_OUT_DIR = "debug"
+
+[env.development]
+LIB_OUT_DIR = "debug"
+
+[env.production]
+LIB_OUT_DIR = "release"
+
+[tasks.test-flow]
+disabled = true
+
+[tasks.android-dev]
+description = "development android x86_64 emulator"
+category = "Build"
+dependencies = ["android-x86_64", "android-x86_64-release"]
+
+[tasks.android-arm]
+description = "build android ARM64 for actual device"
+category = "Build"
+dependencies = ["android-aarch64", "android-aarch64-release"]
+
+
+[tasks.build]
+description = "Runs the rust compiler."
+category = "Build"
+dependencies = ["android"]
+
+[tasks.build.mac]
+dependencies = ["android", "ios"]
+
+[tasks.ios]
+description = "build iOS targets"
+category = "Build"
+dependencies = ["ios-build", "ios-release", "post-ios"]
+
+[tasks.ios-build]
+condition = { platforms = ["mac"], profiles = ["development"] }
+description = "Build ios targets."
+category = "Build"
+command = "cargo"
+args = ["lipo"]
+
+[tasks.ios-release]
+condition = { platforms = ["mac"], profiles = ["production"] }
+description = "Build ios targets."
+category = "Build"
+command = "cargo"
+args = ["lipo", "--release"]
+
+[tasks.android]
+description = "Build android targets."
+category = "Build"
+dependencies = [
+  "pre-android",
+  "android-aarch64",
+  "android-aarch64-release",
+  "post-android-aarch64",
+  "android-armv7",
+  "android-armv7-release",
+  "post-android-armv7",
+  "android-i686",
+  "android-i686-release",
+  "post-android-i686",
+  "android-x86_64",
+  "android-x86_64-release",
+  "post-android-x86_64",
+]
+
+[tasks.native]
+dependencies = ["native-build", "native-release"]
+
+[tasks.native-build]
+condition = { profiles = ["development"] }
+command = "cargo"
+args = ["build"]
+
+[tasks.native-release]
+condition = { profiles = ["production"] }
+command = "cargo"
+args = ["build", "--release"]
+
+[tasks.android-build]
+private = true
+condition = { profiles = ["development"], env_set = ["ANDROID_TARGET"] }
+command = "cargo"
+args = [
+  "ndk",
+  "--platform",
+  "${ANDROID_PLATFORM_VERSION}",
+  "--target",
+  "${ANDROID_TARGET}",
+  "build",
+]
+
+[tasks.android-build-release]
+private = true
+condition = { profiles = ["production"], env_set = ["ANDROID_TARGET"] }
+command = "cargo"
+args = [
+  "ndk",
+  "--platform",
+  "${ANDROID_PLATFORM_VERSION}",
+  "--target",
+  "${ANDROID_TARGET}",
+  "build",
+  "--release",
+]
+
+[tasks.android-aarch64]
+private = true
+condition = { profiles = ["development"] }
+env = { ANDROID_TARGET = "aarch64-linux-android" }
+run_task = "android-build"
+
+[tasks.android-armv7]
+private = true
+condition = { profiles = ["development"] }
+env = { ANDROID_TARGET = "armv7-linux-androideabi" }
+run_task = "android-build"
+
+[tasks.android-i686]
+private = true
+condition = { profiles = ["development"] }
+env = { ANDROID_TARGET = "i686-linux-android" }
+run_task = "android-build"
+
+[tasks.android-x86_64]
+private = true
+condition = { profiles = ["development"] }
+env = { ANDROID_TARGET = "x86_64-linux-android" }
+run_task = "android-build"
+
+[tasks.android-aarch64-release]
+private = true
+condition = { profiles = ["production"] }
+env = { ANDROID_TARGET = "aarch64-linux-android" }
+run_task = "android-build-release"
+
+[tasks.android-armv7-release]
+private = true
+condition = { profiles = ["production"] }
+env = { ANDROID_TARGET = "armv7-linux-androideabi" }
+run_task = "android-build-release"
+
+[tasks.android-i686-release]
+private = true
+condition = { profiles = ["production"] }
+env = { ANDROID_TARGET = "i686-linux-android" }
+run_task = "android-build-release"
+
+[tasks.android-x86_64-release]
+private = true
+condition = { profiles = ["production"] }
+env = { ANDROID_TARGET = "x86_64-linux-android" }
+run_task = "android-build-release"
+
+[tasks.post-ios]
+script_runner = "@duckscript"
+condition = { platforms = ["mac"] }
+script = [
+  """
+    cp ${CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY}/target/universal/${LIB_OUT_DIR}/libowlchat_media_toolkit.a \
+    ${CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY}/ios/libowlchat_media_toolkit.a
+    """,
+  """
+    cp ${CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY}/${CARGO_MAKE_CRATE_CURRENT_WORKSPACE_MEMBER}/binding.h \
+    ${CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY}/ios/Classes/binding.h
+    """,
+]
+
+[tasks.pre-android]
+private = true
+script_runner = "@duckscript"
+script = [
+  "mkdir ${CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY}/android/src/main/jniLibs/arm64-v8a",
+  "mkdir ${CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY}/android/src/main/jniLibs/armeabi-v7a",
+  "mkdir ${CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY}/android/src/main/jniLibs/x86",
+  "mkdir ${CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY}/android/src/main/jniLibs/x86_64",
+]
+
+[tasks.copy-lib]
+private = true
+condition = { env_set = ["ANDROID_TARGET", "JNI_LIB_DIR"] }
+script_runner = "@duckscript"
+script = [
+  """
+    cp ${CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY}/target/${ANDROID_TARGET}/${LIB_OUT_DIR}/libowlchat_media_toolkit.so \
+    ${CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY}/android/src/main/jniLibs/${JNI_LIB_DIR}/libowlchat_media_toolkit.so
+    """,
+]
+
+[tasks.post-android-aarch64]
+private = true
+env = { ANDROID_TARGET = "aarch64-linux-android", JNI_LIB_DIR = "arm64-v8a" }
+run_task = "copy-lib"
+
+[tasks.post-android-armv7]
+private = true
+env = { ANDROID_TARGET = "armv7-linux-androideabi", JNI_LIB_DIR = "armeabi-v7a" }
+run_task = "copy-lib"
+
+[tasks.post-android-i686]
+private = true
+env = { ANDROID_TARGET = "i686-linux-android", JNI_LIB_DIR = "x86" }
+run_task = "copy-lib"
+
+
+[tasks.post-android-x86_64]
+private = true
+env = { ANDROID_TARGET = "x86_64-linux-android", JNI_LIB_DIR = "x86_64" }
+run_task = "copy-lib"
